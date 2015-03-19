@@ -29,7 +29,7 @@ export PKG_CXXFLAGS="-std=c++11 -fopenmp -I/home/<csif-login>/Rcpp/inst/include"
 R CMD SHLIB thrustcombn.cpp
 
 
-TODO: 3/19
+TODO: 2/19
 1. Pass retMat = array of size pos[len[pos]] * k to device function -> This may need to be bigger 
 2. In device function, find_comb, pass pos[i]*k as argument to be the size of the return array. 
 3. As each thread goes through the function find_comb, it updates the respective section (should be ordered then)

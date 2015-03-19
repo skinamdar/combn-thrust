@@ -10,25 +10,12 @@
 
 using namespace std;
 
-__device__
-int next_comb(int *comb, int m, int n){
-    printf("Inside next_comb\n");
 
-    int i = m - 1;
-    ++comb[i];
-    
-    while((i >= 0) && (comb[i] >= n - m + 1 - i)){
-        --i;
-        ++comb[i];
-    }
-    if(comb[0] == 1){
-        return 0;
-    }
-    for(i = i + 1; i < m; ++i){
-        comb[i] = comb[i-1] + 1;
-    }
-    return 1;
-}
+// treat it as C code
+/* extern "C" {
+    SEXP gpumutin(SEXP a, SEXP nb);
+} */
+
 
 __device__
 void find_comb(int idx, int *x, int m, int n, int*pos){
@@ -60,7 +47,7 @@ void find_comb(int idx, int *x, int m, int n, int*pos){
 
     //printf("index %d has n = %d\n", idx, new_n);
     
-    printf("ANSWER %d %d %d\n", x[comb[0] + idx], x[comb[1]+idx], x[comb[2]+idx]);
+    printf("ANSWER1! %d %d %d\n", x[comb[0] + idx], x[comb[1]+idx], x[comb[2]+idx]);
     //printf("after 1st one %d %d %d\n", comb[0], comb[1], comb[2]);
     
     //	while(next_comb(comb, m, new_n)){
@@ -80,6 +67,7 @@ void find_comb(int idx, int *x, int m, int n, int*pos){
             ++comb[i];
         }
         //printf("	after while, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
+        // maybe change to its not hardcoded? not 100% about this line
         if(comb[0] == 1){
             break;
         }
@@ -120,8 +108,10 @@ struct comb {
     __device__
     void operator()(int i)
     {
+        int j = 0; 
+        printf("number time passed is: %d\n", j++);
         if(i <= n - m)
-            //	printf("%d ", i);
+            	printf("%d ", i);
             find_comb(i, x_ptr, m, n,pos_ptr);
     }
 };
