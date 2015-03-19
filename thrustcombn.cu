@@ -31,8 +31,13 @@ int next_comb(int *comb, int m, int n){
 }
 
 __device__
-void find_comb(int idx, int *x, int m, int n){
+void find_comb(int idx, int *x, int m, int n, int*pos){
     printf("Inside find_comb");
+
+    // test pos passed correctly
+     for(int i = 0; i < n-m+1; i++){
+        printf("Dpos [%d] = %d \n",i,pos[i]);
+    } 
 
     //printf("%d, %d\n", i, x[i]);
     //printf("m = %d\n", m);
@@ -91,19 +96,22 @@ struct comb {
     
     const thrust::device_vector<int>::iterator x;
     const thrust::device_vector<int>::iterator r;//might use this to store result?
+    const thrust::device_vector<int>::iterator pos; 
     int n;
     int m;
-    int *x_ptr, *r_ptr;
+    int *x_ptr, *r_ptr, *pos_ptr;
     int *comb_arr;
     
-    comb(thrust::device_vector<int>::iterator _x, thrust::device_vector<int>::iterator _r, int _n, int _m):
+    comb(thrust::device_vector<int>::iterator _x, thrust::device_vector<int>::iterator _r, int _n, int _m,thrust::device_vector<int>::iterator _pos):
     x(_x),
     r(_r),
     n(_n),
-    m(_m)
+    m(_m),
+    pos(_pos)
     {
         x_ptr = thrust::raw_pointer_cast(&x[0]);
         r_ptr = thrust::raw_pointer_cast(&r[0]);
+        pos_ptr = thrust::raw_pointer_cast(&pos[0]);
     }
     
     __device__
@@ -111,15 +119,16 @@ struct comb {
     {
         if(i <= n - m)
             //	printf("%d ", i);
-            find_comb(i, x_ptr, m, n);
+            find_comb(i, x_ptr, m, n,pos_ptr);
     }
 };
 
-void combn(int*x, int n, int m, int *comb_arr, int *result, int nCm){
+void combn(int*x, int n, int m, int *comb_arr, int *result, int nCm, int*pos ){
     //void combn(int *x, int n, int m, vector<int> result){
     
     thrust::device_vector<int> d_x(x, x+n);
     thrust::device_vector<int> d_r(result, result + (nCm * m));
+    thrust::device_vector<int> d_pos(pos, pos + (n-m+1));
     
     /*
      thrust::device_vector<int> d_c(comb_arr, comb_arr + m);
@@ -133,7 +142,7 @@ void combn(int*x, int n, int m, int *comb_arr, int *result, int nCm){
     
     
     //	thrust::transform(begin, end, d_r.begin(), comb(d_x.begin(), d_r.begin(), n, m));
-    thrust::for_each(begin, end, comb(d_x.begin(), d_r.begin(), n, m));
+    thrust::for_each(begin, end, comb(d_x.begin(), d_r.begin(), n, m, d_pos.begin()));
     
     //thrust::copy(d_r.begin(), d_r.end(), result);
 }
@@ -147,16 +156,21 @@ int main(){
     int x[n];
     int *result;
     
+    // Count the number of possible combinations 
     int nCm = boost::math::binomial_coefficient<double>(n, m);
+
+    // Size of output array 
     result = new int[nCm * m];
     
-    int *pos = new int[n];	// keeps track of the position in output
+    // keeps track of the position in output
+    int *pos = new int[n-m+1];	
     
+    // test input array 
     cout << "x = ";
     for(int i=0; i<n; i++)
     {
-       // x[i] = rand() % 5;
-         x[i] = i;
+        //x[i] = rand() % 5;
+        x[i] = i; 
         cout << x[i] << " ";
     }
     cout << endl;
@@ -166,23 +180,27 @@ int main(){
         comb_arr[i] = i;
     }
     
-    int tmp_n = n;
+
+    // Calculate combination possibilities for each element in the list that 
+    // start with the element in the 0th index 
+    int tmp_n = n; // Why do we need a tmp_n ??
     int k = 0;
     for(int i = 0; i < (n-m+1); i++){
         pos[i] = boost::math::binomial_coefficient<double>(tmp_n - i - 1, m-1);
         k++;
     }
-    
-    //Calculate position -> refer to Trisha's parallel code
-    //	cout << "nCm = " << nCm << endl;
-    //	cout << "k = " << k << endl;
-    //	cout << "n-m+1 = " << n-m+1 << endl;
-   /*  for(int i = 0; i < n-m+1; i++){
+     
+    // Print for testing purposees 
+    cout << "nCm = " << nCm << endl;
+    cout << "k = " << k << endl;
+    cout << "n-m+1 = " << n-m+1 << endl;
+    for(int i = 0; i < n-m+1; i++){
         cout << "pos[" << i << "] = " << pos[i] << endl;
-    } */
+    } 
     
-    //combn(x, n, m, result);   
-    	combn(x, n, m, comb_arr, result, nCm);
+  
+    //combn(x, n, m, comb_arr, result, nCm);
+    combn(x, n, m, comb_arr, result, nCm,pos);
     
     cout << "result = ";
     for(int i = 0; i < n; i++){
