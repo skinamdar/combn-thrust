@@ -12,6 +12,8 @@ using namespace std;
 
 __device__
 int next_comb(int *comb, int m, int n){
+    printf("Inside next_comb\n");
+
     int i = m - 1;
     ++comb[i];
     
@@ -30,6 +32,8 @@ int next_comb(int *comb, int m, int n){
 
 __device__
 void find_comb(int idx, int *x, int m, int n){
+    printf("Inside find_comb");
+
     //printf("%d, %d\n", i, x[i]);
     //printf("m = %d\n", m);
     int *comb = new int[m];
@@ -151,7 +155,8 @@ int main(){
     cout << "x = ";
     for(int i=0; i<n; i++)
     {
-        x[i] = rand() % 5;
+       // x[i] = rand() % 5;
+         x[i] = i;
         cout << x[i] << " ";
     }
     cout << endl;
@@ -172,12 +177,12 @@ int main(){
     //	cout << "nCm = " << nCm << endl;
     //	cout << "k = " << k << endl;
     //	cout << "n-m+1 = " << n-m+1 << endl;
-    for(int i = 0; i < n-m+1; i++){
+   /*  for(int i = 0; i < n-m+1; i++){
         cout << "pos[" << i << "] = " << pos[i] << endl;
-    } 
+    } */
     
     //combn(x, n, m, result);   
-    //	combn(x, n, m, comb_arr, result, nCfm);
+    	combn(x, n, m, comb_arr, result, nCm);
     
     cout << "result = ";
     for(int i = 0; i < n; i++){
