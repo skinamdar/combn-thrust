@@ -41,6 +41,8 @@ void find_comb(int idx, int *x, int m, int n, int*pos){
 
     //printf("%d, %d\n", i, x[i]);
     //printf("m = %d\n", m);
+
+    // initialize combn array but TODO for flexibility of input x being passed in
     int *comb = new int[m];
     for(int i = 0; i < m; i++){
         comb[i] = i;
@@ -55,10 +57,11 @@ void find_comb(int idx, int *x, int m, int n, int*pos){
      printf("\n");
      */
     //	printf("	%d %d %d\n", comb[0], comb[1], comb[2]);
-    printf("index %d has n = %d\n", idx, new_n);
+
+    //printf("index %d has n = %d\n", idx, new_n);
     
     printf("ANSWER %d %d %d\n", x[comb[0] + idx], x[comb[1]+idx], x[comb[2]+idx]);
-    printf("after 1st one %d %d %d\n", comb[0], comb[1], comb[2]);
+    //printf("after 1st one %d %d %d\n", comb[0], comb[1], comb[2]);
     
     //	while(next_comb(comb, m, new_n)){
     //		printf("inside whiel?");
@@ -67,24 +70,24 @@ void find_comb(int idx, int *x, int m, int n, int*pos){
     //	}
     
     while(true){
-        printf(" inside comb is: %d %d %d, i = nothing\n", comb[0], comb[1], comb[2]);
+      //  printf(" inside comb is: %d %d %d, i = nothing\n", comb[0], comb[1], comb[2]);
         int i = m - 1;
         ++comb[i];
         
-        printf("	after ++comb, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
+        //printf("	after ++comb, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
         while((i >= 0) && (comb[i] >= new_n - m + 1 + i)){
             --i;
             ++comb[i];
         }
-        printf("	after while, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
+        //printf("	after while, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
         if(comb[0] == 1){
             break;
         }
-        printf("	after if, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
+        //printf("	after if, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
         for(i = i + 1; i < m; ++i){
             comb[i] = comb[i-1] + 1;
         }
-        printf("	after for, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
+        //printf("	after for, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
         //return 1;
         
         printf("ANSWER %d %d %d\n", x[comb[0]+idx], x[comb[1]+idx], x[comb[2]+idx]);
