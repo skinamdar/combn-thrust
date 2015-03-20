@@ -16,54 +16,48 @@ using namespace Rcpp;
 
 struct comb {
 	
-	/* const thrust::device_vector<int>::iterator x;
-	//const thrust::device_vector<int>::iterator r;//might use this to store result?
+	const thrust::device_vector<int>::iterator x;
+	const thrust::device_vector<int>::iterator pos;
+	const thrust::device_vector<int>::iterator retmat;
 	int n;
 	int m;
-	int *x_ptr;// , *r_ptr;
-	int *comb_arr;
+	int *x_arr, *position, *ret;
 
-//	comb(thrust::device_vector<int>::iterator _x, thrust::device_vector<int>::iterator _r, int _n, int _m):
-	comb(thrust::device_vector<int>::iterator _x, int _n, int _m):
-		x(_x),
-//		r(_r),
+
+	comb(thrust::device_vector<int>::iterator _x_arr, thrust::device_vector<int>::iterator _pos, int _n, int _m, thrust::device_vector<int>::iterator _retmat):
+		x(_x_arr),
+		pos(_pos),
 		n(_n),
-		m(_m)
+		m(_m),
+		retmat(_retmat)
 	{
-		x_ptr = thrust::raw_pointer_cast(&x[0]);		
-//		r_ptr = thrust::raw_pointer_cast(&r[0]);
-	} */
-    
-    
-    const thrust::device_vector<int>::iterator x;
-    const thrust::device_vector<int>::iterator r;//might use this to store result?
-    const thrust::device_vector<int>::iterator pos;
-    int n;
-    int m;
-    int *x_ptr, *r_ptr, *pos_ptr;
-    int *comb_arr;
-    
-    comb(thrust::device_vector<int>::iterator _x, thrust::device_vector<int>::iterator _r, int _n, int _m,thrust::device_vector<int>::iterator _pos):
-    x(_x),
-    r(_r),
-    n(_n),
-    m(_m),
-    pos(_pos)
-    {
-        x_ptr = thrust::raw_pointer_cast(&x[0]);
-        r_ptr = thrust::raw_pointer_cast(&r[0]);
-        pos_ptr = thrust::raw_pointer_cast(&pos[0]);
-    }
+		x_arr = thrust::raw_pointer_cast(&x[0]);		
+		position = thrust::raw_pointer_cast(&pos[0]);
+		ret = thrust::raw_pointer_cast(&retmat[0]);
+	}
 	
 	__device__
 	void operator()(int i)
 	{
+//		printf("pos: ");
+//		for(int i = 0; i < m; i++){
+//			printf("%d\n", position[i]);
+//		}
+
 		if(i <= n - m)
-			find_comb(i, x_ptr, m, n,pos_ptr,r_ptr);
+		//	printf("%d ", i);
+			find_comb(i, x_arr, m, n, position, ret);
+	}
+	__device__
+	void store(int *pos, int *output, int idx, int m, int *x, int *comb){
+		for(int i = 0; i < m; i++){
+			output[pos[idx]++] = x[comb[i]+idx];
+		}
+
 	}
 
 	__device__
-	void find_comb(int idx, int *x, int m, int n, int* pos, int*out){
+	void find_comb(int idx, int *x, int m, int n, int *pos, int *output){
 		//printf("%d, %d\n", i, x[i]);
 		//printf("m = %d\n", m);
 		int *comb = new int[m];
@@ -71,6 +65,13 @@ struct comb {
 			comb[i] = i;
 		}
 		int new_n= n - idx;
+		
+	//	printf("pos = ");
+	//	for(int i = 0; i < m; i++){
+	//		printf("%d ", pos[i]);
+	//	}
+	//	printf("\n");
+
 
 	/*
 		printf("the x inside = ");
@@ -82,7 +83,13 @@ struct comb {
 	//	printf("	%d %d %d\n", comb[0], comb[1], comb[2]);		
 	//	printf("index %d has n = %d\n", idx, new_n);
 	
-		printf("ANSWER %d %d %d\n", x[comb[0] + idx], x[comb[1]+idx], x[comb[2]+idx]);
+//		printf("ANSWER %d %d %d\n", x[comb[0] + idx], x[comb[1]+idx], x[comb[2]+idx]);
+		store(pos, output, idx, m, x, comb);
+
+	
+		// store into 
+
+
 	//	printf("after 1st one %d %d %d\n", comb[0], comb[1], comb[2]);		
 	
 	//	while(next_comb(comb, m, new_n)){
@@ -112,92 +119,12 @@ struct comb {
 	//		printf("	after for, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
 			//return 1;
 		
-			printf("ANSWER %d %d %d\n", x[comb[0]+idx], x[comb[1]+idx], x[comb[2]+idx]);
-            
-            out[pos[idx]++] = x[comb[0]+idx];
-            out[pos[idx]++] = x[comb[1]+idx];
-            out[pos[idx]++] = x[comb[2]+idx];
+	//		printf("ANSWER %d %d %d\n", x[comb[0]+idx], x[comb[1]+idx], x[comb[2]+idx]);
+			store(pos, output, idx, m, x, comb);
 		}
 	}
 
 };
-
-/*
-void combn(int*x, int n, int m, int *comb_arr, int *result, int nCm){
-//void combn(int *x, int n, int m, vector<int> result){
-
-	thrust::device_vector<int> d_x(x, x+n);
-	thrust::device_vector<int> d_r(result, result + (nCm * m));
-
-
-//	thrust::device_vector<int> d_c(comb_arr, comb_arr + m);
-//	for(int i = 0; i < m; i++){
-//		printf("%d %d %d", comb_arr[0], comb_arr[1], comb_arr[2]);
-//	}
-
-	thrust::counting_iterator<int> begin(0);
-	thrust::counting_iterator<int> end = begin + n;
-
-	
-//	thrust::transform(begin, end, d_r.begin(), comb(d_x.begin(), d_r.begin(), n, m));
-	thrust::for_each(begin, end, comb(d_x.begin(), d_r.begin(), n, m));
-	
-	//thrust::copy(d_r.begin(), d_r.end(), result);
-}
-*/
-/*
-int main(){
-	int n = 5;
-	int m = 3;
-
-	int x[n];
-	int *result;	
-	
-	int nCm = boost::math::binomial_coefficient<double>(n, m);
-	result = new int[nCm * m];
-
-	int *pos = new int[n];	// keeps track of the position in output
-
-	cout << "x = ";	   
-    for(int i=0; i<n; i++)
-    {
-        x[i] = rand() % 5;
-		cout << x[i] << " ";
-	}
-	cout << endl;
-
-	int *comb_arr = new int[m];
-	for(int i = 0; i < m; i++){
-		comb_arr[i] = i;
-	}
-
-	int tmp_n = n;
-	int k = 0;
-	for(int i = 0; i < (n-m+1); i++){
-		pos[i] = boost::math::binomial_coefficient<double>(tmp_n - i - 1, m-1);
-		k++;
-	}
-//	cout << "nCm = " << nCm << endl;
-//	cout << "k = " << k << endl;
-//	cout << "n-m+1 = " << n-m+1 << endl;
-	for(int i = 0; i < n-m+1; i++){
-		cout << "pos[" << i << "] = " << pos[i] << endl;
-	} 
-	
-	//combn(x, n, m, result);   
-	combn(x, n, m, comb_arr, result, nCm);
-
-	cout << "result = ";
-	for(int i = 0; i < n; i++){
-		cout << result[i] << " ";
-	}
-	cout << endl;
-	return 0;
-
-
-}
-*/
-
 
 RcppExport SEXP combn(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP pos_, SEXP out){
 	NumericVector x(x_);
@@ -206,10 +133,10 @@ RcppExport SEXP combn(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP pos_, SEXP out)
 	NumericMatrix retmat(m, nCm);
 
 	
-//	thrust::device_vector<int> d_x(x, x+n);
 	thrust::device_vector<int> d_x(x.begin(), x.end());
-	thrust::device_vector<int> d_r(nCm*n);
-    thrust::device_vector<int> d_pos(pos.begin(),pos.end());
+	thrust::device_vector<int> d_pos(pos.begin(), pos.end());
+	thrust::device_vector<int> d_mat(retmat.begin(), retmat.end());
+
 
 //	thrust::device_vector<int> d_c(comb_arr, comb_arr + m);
 //	for(int i = 0; i < m; i++){
@@ -220,12 +147,10 @@ RcppExport SEXP combn(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP pos_, SEXP out)
 	thrust::counting_iterator<int> end = begin + n;
 
 	
-//	thrust::transform(begin, end, d_r.begin(), comb(d_x.begin(), d_r.begin(), n, m));
-//	thrust::for_each(begin, end, comb(d_x.begin(), d_r.begin(), n, m));
-	thrust::for_each(begin, end, comb(d_x.begin(),d_r.begin(), n, m,d_pos.begin()));
+	thrust::for_each(begin, end, comb(d_x.begin(), d_pos.begin(), n, m, d_mat.begin()));
+
+	thrust::copy(d_mat.begin(), d_mat.end(), retmat.begin());
 	
-	//thrust::copy(d_r.begin(), d_r.end(), result);
 	return retmat;
     
 }
-
