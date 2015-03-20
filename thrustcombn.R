@@ -7,8 +7,8 @@
 # Function Arguments:
 # x <- input vector of integers and/or characters\
 # m <- number of elements in a combination
-# fun <- function to apply to the resulting output
-# simplify <- if TRUE print output as a matrix with m rows and nCm columns
+# fun <- function to apply to the resulting outputcolumns
+# simplify <- if TRUE print output as a matrix with m rows and nCm 
 # where nCm is the total number of combinations generated
 # ... <- parameters for fun
 
@@ -75,7 +75,7 @@ combn <- function(x, m, fun = NULL, simplify = TRUE, ...)
 	ischarx <- match('TRUE', is.letter(x))
 	if (!is.na(ischarx)) {
 		ischarx_arr <- is.letter(x)
-		for (i in 1:length(charx)) {
+		for (i in 1:length(ischarx_arr)) {
 			if (ischarx_arr[i]) {
 				if (length(asc(x[i])) == 1) {
 					x[i] <- asc(x[i])
@@ -110,7 +110,7 @@ combn <- function(x, m, fun = NULL, simplify = TRUE, ...)
 	retmat <- matrix(0, m, count)
 	# Call the function through Rcpp
 	# retmat <- .Call("combn", x, m, n, count, sched, chunksize, pos)
-	retmat <- .Call("combn", x, m, n, count, pos)
+	retmat <- .Call("combn", x, m, n, count)
 
 	# Convert from ASCII decimal values back to chars if necessary
 	if (!is.na(ischarx)) {
