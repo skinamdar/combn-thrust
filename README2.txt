@@ -12,3 +12,4 @@ Then start R session
 source('/path/to/thrustcombn.R')
 combn(x,m)
 
+

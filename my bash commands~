@@ -1,17 +1,14 @@
-bash
-export R_LIBS_USER=/home/skinamda/Rcpp
-export PKG_LIBS="-lgomp"
-export PKG_CXXFLAGS="-std=c++11 -fopenmp -I/home/skinamda/Rcpp/inst/include"
-R CMD SHLIB thrustcombn.cpp
-
-
-
-// update -> run 
+1. Start a bash session
 [skinamda@pc43 project]$ bash
-bash-4.2$ export CPLUS_INCLUDE_PATH=/home/skinamda/R/x86_64-redhat-linux-gnu-library/3.1/Rcpp/include/
-bash-4.2$ nvcc -x cu -c -arch=sm_20 t2.cpp -Xcompiler "-fpic"  -I/usr/include/R
-bash-4.2$  export PKG_LIBS="-L/usr/local/cuda/lib64 -lcudart"
-bash-4.2$ R CMD SHLIB t2.o -o t2.so
-gcc -m64 -std=gnu99 -shared -L/usr/lib64/R/lib -Wl,-z,relro -o t2.so t2.o -L/usr/local/cuda/lib64 -lcudart -L/usr/lib64/R/lib -lR
-bash-4.2$ export LD_LIBRARY_PATH=/usr/local/cuda/lib64
+export CPLUS_INCLUDE_PATH=/home/skinamda/R/x86_64-redhat-linux-gnu-library/3.1/Rcpp/include/
+nvcc -x cu -c -arch=sm_20 thrustcombn.cpp -Xcompiler "-fpic"  -I/usr/include/R
+export PKG_LIBS="-L/usr/local/cuda/lib64 -lcudart"
+R CMD SHLIB thrustcombn.o -o thrustcombn.so
+gcc -m64 -std=gnu99 -shared -L/usr/lib64/R/lib -Wl,-z,relro -o thrustcombn.so thrustcombn.o -L/usr/local/cuda/lib64 -lcudart -L/usr/lib64/R/lib -lR
+ export LD_LIBRARY_PATH=/usr/local/cuda/lib64
+
+Then start R session 
+>library(Rcpp)
+source('/path/to/thrustcombn.R')
+combn(x,m)
 

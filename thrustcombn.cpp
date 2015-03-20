@@ -1,5 +1,5 @@
 // R function combn parallelized with thrust
-// Need to add comments 
+// Need to add comments
 #include <iostream>
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
@@ -101,7 +101,7 @@ RcppExport SEXP combn(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP out){
         pos[i] = boost::math::binomial_coefficient<double>(tmp_n - i - 1, m-1);
         k++;
     }
-    
+    // Calcluate the position vector respective to the possiblities
     int temp = pos[0]*m;
     int temp2;
     pos[0]=0;
@@ -115,11 +115,9 @@ RcppExport SEXP combn(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP out){
     thrust::device_vector<int> d_pos(pos, pos + (n-m+1));
 	thrust::device_vector<int> d_mat(retmat.begin(), retmat.end());
     
-
 	thrust::counting_iterator<int> begin(0);
 	thrust::counting_iterator<int> end = begin + n;
 
-	
 	thrust::for_each(begin, end, comb(d_x.begin(), d_pos.begin(), n, m, d_mat.begin()));
 
 	thrust::copy(d_mat.begin(), d_mat.end(), retmat.begin());
