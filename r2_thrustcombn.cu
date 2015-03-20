@@ -86,9 +86,9 @@ void find_comb(int idx, int *x, int m, int n, int*pos, int *out){
 
         //r[pos[idx++]]
 
-        out[pos[idx]++] = x[comb[0]+idx];
-        out[pos[idx]++] = x[comb[1]+idx];
-        out[pos[idx]++] = x[comb[2]+idx];
+        r[pos[idx]++] = x[comb[0]+idx];
+        r[pos[idx]++] = x[comb[1]+idx];
+        r[pos[idx]++] = x[comb[2]+idx];
 
     }
 }
@@ -130,8 +130,8 @@ struct comb {
 RcppExport SEXP combn(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP pos_)
 {
     // Convert SEXP variables to appropriate C++ types
-    intvec x(x_); // input vector
-    intvec pos(pos_); // position vector for the combinations so that the output is sorted
+    NumericVector x(x_); // input vector
+    NumericVector pos(pos_); // position vector for the combinations so that the output is sorted
     int m = as<int>(m_), n = as<int>(n_), nCm = as<int>(nCm_);
 
     NumericMatrix retmat(m, nCm);
@@ -148,7 +148,7 @@ RcppExport SEXP combn(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP pos_)
     
     //  thrust::transform(begin, end, d_r.begin(), comb(d_x.begin(), d_r.begin(), n, m));
     thrust::for_each(begin, end, comb(d_x.begin(), d_r.begin(), n, m, d_pos.begin()));
-    thrust::copy(d_r.begin(), d_r.end(), retmat);
+    thrust::copy(ddst.begin(), ddst.end(), retmat);
 
 
     return retmat; 

@@ -35,3 +35,7 @@ TODO: 3/19
 3. As each thread goes through the function find_comb, it updates the respective section (should be ordered then)
 4. return retMat to check if output printd. 
 
+Revision to run program: 
+1 Install or load rcpp using bash
+2. Open R session and type library(Rcpp) to confirm installation 
+
