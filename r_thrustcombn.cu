@@ -119,6 +119,25 @@ struct comb {
     }
 };
 
+
+RcppExport SEXP combn(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP pos_, SEXP out)
+{
+    // Convert SEXP variables to appropriate C++ types
+    NumericVector x(x_); // input vector
+    NumericVector pos(pos_); // position vector for the combinations so that the output is sorted
+    int m = as<int>(m_), n = as<int>(n_), nCm = as<int>(nCm_);
+
+    NumericMatrix retmat(m, nCm);
+
+    // make space for input, output, and pos vector 
+    thrust::device_vector<int> d_x(x, x+n);
+    thrust::device_vector<int> d_r(result, result + (nCm * m));
+    thrust::device_vector<int> d_pos(pos, pos + (n-m+1));
+
+
+
+}
+
 void combn(int*x, int n, int m, int *comb_arr, int *result, int nCm, int*pos ){
     //void combn(int *x, int n, int m, vector<int> result){
     
