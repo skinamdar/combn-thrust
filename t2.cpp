@@ -41,17 +41,19 @@ struct comb {
 	{
 //		printf("pos: ");
 //		for(int i = 0; i < m; i++){
-//			printf("%d\n", position[i]);
+	//		printf("operator: %d\n", i);
 //		}
 
-		if(i <= n - m)
-		//	printf("%d ", i);
-			find_comb(i, x_arr, m, n, position, ret);
+        if(i <= n - m) {
+      //      printf("operatorinside: %d\n", i);
+            find_comb(i, x_arr, m, n, position, ret);
+        }
 	}
 	__device__
-	void store(int *pos, int *output, int idx, int m, int *x, int *comb){
+	void store(int *pos, int *output, int idx, int m, int *x, int *comb, int &outidx){
+        printf("Store idx: %d and outidx is: %d\n",idx, outidx);
 		for(int i = 0; i < m; i++){
-			output[pos[idx]++] = x[comb[i]+idx];
+			output[outidx++] = x[comb[i]+idx];
 		}
 
 	}
@@ -65,6 +67,8 @@ struct comb {
 			comb[i] = i;
 		}
 		int new_n= n - idx;
+        
+        int outidx = idx*pos[idx];
 		
 	//	printf("pos = ");
 	//	for(int i = 0; i < m; i++){
@@ -83,8 +87,11 @@ struct comb {
 	//	printf("	%d %d %d\n", comb[0], comb[1], comb[2]);		
 	//	printf("index %d has n = %d\n", idx, new_n);
 	
-//		printf("ANSWER %d %d %d\n", x[comb[0] + idx], x[comb[1]+idx], x[comb[2]+idx]);
-		store(pos, output, idx, m, x, comb);
+		printf("ANSWER! %d %d %d wtth index: %d\n", x[comb[0] + idx], x[comb[1]+idx], x[comb[2]+idx], idx);
+        
+		store(pos, output, idx, m, x, comb, outidx);
+        
+        printf("outidx! is: %d \n", outidx);
 
 	
 		// store into 
@@ -119,8 +126,10 @@ struct comb {
 	//		printf("	after for, comb is %d %d %d, i = %d\n", comb[0], comb[1], comb[2], i);
 			//return 1;
 		
-	//		printf("ANSWER %d %d %d\n", x[comb[0]+idx], x[comb[1]+idx], x[comb[2]+idx]);
-			store(pos, output, idx, m, x, comb);
+			printf("ANSWER %d %d %d wtih index %d \n", x[comb[0]+idx], x[comb[1]+idx], x[comb[2]+idx],idx);
+			//store(pos, output, idx, m, x, comb);
+            store(pos, output, idx, m, x, comb, outidx);
+            printf("outidx2 is: %d \n", outidx);
 		}
 	}
 
@@ -128,14 +137,52 @@ struct comb {
 
 RcppExport SEXP combn(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP pos_, SEXP out){
 	NumericVector x(x_);
-	NumericVector pos(pos_);
+	NumericVector pos1(pos_);
 	int m = as<int>(m_), n = as<int>(n_), nCm = as<int>(nCm_);
 	NumericMatrix retmat(m, nCm);
 
+    // keeps track of the position in output
+    int *pos = new int[n-m+1];
+    
+    // Calculate combination possibilities for each element in the list that
+    // start with the element in the 0th index
+    int tmp_n = n; // Why do we need a tmp_n ??
+    int k = 0;
+    for(int i = 0; i < (n-m+1); i++){
+        pos[i] = boost::math::binomial_coefficient<double>(tmp_n - i - 1, m-1);
+        k++;
+    }
+    
+    int temp = pos[0]*m;
+    int temp2;
+    pos[0]=0;
+    for (int j=1; j<(n-m+1); j++){
+        temp2 = pos[j];
+        pos[j]=temp;
+        temp=pos[j]+(m*temp2);
+    }
+    
+    /* temp <- pos[1]
+    pos[1] <- 0
+    for (i in 2:length(pos)) {
+        temp2 <- pos[i]
+        pos[i] <- temp
+        temp <- pos[i] + temp2
+    }*/
+    
+    for (int i=0; i<(n-m+1); i++){
+        printf("pos [%d] = %d \n:",i,pos[i]);
+    }
 	
 	thrust::device_vector<int> d_x(x.begin(), x.end());
-	thrust::device_vector<int> d_pos(pos.begin(), pos.end());
+	//thrust::device_vector<int> d_pos(pos.begin(), pos.end());
+    thrust::device_vector<int> d_pos(pos, pos + (n-m+1));
 	thrust::device_vector<int> d_mat(retmat.begin(), retmat.end());
+    
+   
+    
+    
+   
 
 
 //	thrust::device_vector<int> d_c(comb_arr, comb_arr + m);

@@ -135,6 +135,8 @@ RcppExport SEXP combn(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP pos_)
     int m = as<int>(m_), n = as<int>(n_), nCm = as<int>(nCm_);
 
     NumericMatrix retmat(m, nCm);
+    
+    printf
 
     // make space for input, output, and pos vector 
     thrust::device_vector<int> d_x(x, x+n);
