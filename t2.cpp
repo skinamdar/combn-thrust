@@ -68,7 +68,7 @@ struct comb {
 		}
 		int new_n= n - idx;
         
-        int outidx = idx*pos[idx];
+        int outidx = pos[idx];
 		
 	//	printf("pos = ");
 	//	for(int i = 0; i < m; i++){
