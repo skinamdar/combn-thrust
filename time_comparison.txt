@@ -1,0 +1,21 @@
+> system.time(combn(sample(1:1:100),2))
+   user  system elapsed 
+  0.013   0.000   0.013 
+> system.time(combn(sample(1:1:100),2))
+   user  system elapsed 
+  0.012   0.000   0.012 
+> system.time(combn(sample(1:1:100),2))
+   user  system elapsed 
+  0.011   0.000   0.012 
+
+
+> system.time(combnT(sample(1:1:100),2))
+   user  system elapsed 
+  0.003   0.001   0.005 
+> system.time(combnT(sample(1:1:100),2))
+   user  system elapsed 
+  0.004   0.001   0.004 
+> system.time(combnT(sample(1:1:100),2))
+   user  system elapsed 
+  0.004   0.001   0.005
+

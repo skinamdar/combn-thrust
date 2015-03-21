@@ -24,7 +24,7 @@
 
 #############################################################################
 
-combn <- function(x, m, fun = NULL, simplify = TRUE, ...)
+combnT <- function(x, m, fun = NULL, simplify = TRUE, ...)
 {
 	require(Rcpp)
 	#require(combinat) # necessary for nCm in line 24
@@ -88,29 +88,12 @@ combn <- function(x, m, fun = NULL, simplify = TRUE, ...)
 		}
 		x <- strtoi(x, base=10)
 	}
-
-
-	# Calculate positions for output
-	pos <- vector()
-	temp_n <- n
-	for (i in 1:(n-m+1)) {
-		pos <- c(pos, nCm(temp_n-i, m-1))
-	}
-	temp <- pos[1]
-	pos[1] <- 0
-	for (i in 2:length(pos)) {
-		temp2 <- pos[i]
-		pos[i] <- temp
-		temp <- pos[i] + temp2
-	}
-
-	# pos <- c(0, 29, 57, 84, 110, 135, 159, 182, 204, 225, 245, 264, 282, 299, 315, 330, 344, 357, 369, 380, 390, 399, 407, 414, 420, 425, 429, 432, 434)
 	
 	# Initialize output matrix
 	retmat <- matrix(0, m, count)
 	# Call the function through Rcpp
 	# retmat <- .Call("combn", x, m, n, count, sched, chunksize, pos)
-	retmat <- .Call("combn", x, m, n, count)
+	retmat <- .Call("combnT", x, m, n, count)
 
 	# Convert from ASCII decimal values back to chars if necessary
 	if (!is.na(ischarx)) {
