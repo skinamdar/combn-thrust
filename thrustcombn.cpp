@@ -85,7 +85,7 @@ struct comb {
 
 };
 
-RcppExport SEXP combnT(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP out){
+RcppExport SEXP combnthrust(SEXP x_, SEXP m_, SEXP n_, SEXP nCm_, SEXP out){
 	NumericVector x(x_);
 	int m = as<int>(m_), n = as<int>(n_), nCm = as<int>(nCm_);
 	NumericMatrix retmat(m, nCm);
